@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Insert title here</title>
+	</head>
+	
+	<body>
+		<link rel="stylesheet" href="https://rawgit.com/codrops/Elastislide/master/css/elastislide.css"/>
+		<link rel="stylesheet" href="https://rawgit.com/codrops/Elastislide/master/css/demo.css"/>
+		<link rel="stylesheet" href="https://rawgit.com/codrops/Elastislide/master/css/custom.css"/>
+		<style>
+			body {
+				background:none
+			}
+			
+			.up .f {
+				width:15%;
+				height:100%;
+				opacity:0
+			}
+			.up .f:focus {
+				outline:none
+			}
+			.up .s {
+				width:15%
+			}
+			.up .r {
+				width:15%;
+				float:right
+			}
+			.c {
+				width:40%;
+				margin:3% auto
+			}
+			
+			#h {
+				border:8px dashed #ccc;
+				width:90%;
+				margin:auto;
+			}
+			#h.hover {
+				border:8px dashed #333
+			}
+			
+			#ih {
+				width:inherit;
+				position:absolute
+			}
+			
+			#op {
+				font-family:Entypo;
+				font-size:250%;
+				color:#d3d3d3;
+				text-align:center
+			}
+			
+			.co {
+				margin-bottom:50px
+			}
+			
+			.elastislide-carousel ul li img{
+				display:block;
+				max-width:100%
+			}
+		</style>
+		
+		<div class="co">
+			<div class="main">
+				<ul id="carousel" class="elastislide-list" style="height:150px">
+					<li><img id="_a" src="http://i.imgur.com/DNqJ2tc.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_b" src="http://i.imgur.com/D5tuGJM.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_c" src="http://i.imgur.com/T4WSl5x.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_d" src="http://i.imgur.com/6CoYFUS.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_e" src="http://i.imgur.com/foLX4oK.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_f" src="http://i.imgur.com/uVOqfj8.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_g" src="http://i.imgur.com/1kICgVJ.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_h" src="http://i.imgur.com/mUJ6w7h.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_i" src="http://i.imgur.com/xfNfJND.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_j" src="http://i.imgur.com/8vH2fCa.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_k" src="http://i.imgur.com/Vlh8Q7z.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_l" src="http://i.imgur.com/TL4BKeO.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_v" src="http://i.imgur.com/k05a6hk.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_w" src="http://i.imgur.com/zjbGUOu.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_y" src="http://i.imgur.com/QpSG5C5.png" draggable="true" ondragstart="drag(event)"/></li>
+					<li><img id="_aa" src="http://i.imgur.com/THNgp62.png" draggable="true" ondragstart="drag(event)"/></li>
+				</ul>
+			</div>
+		</div>
+		
+		<img style="float:left;margin-top:30px" title="Share To Facebook"
+			 src="http://bit.ly/1kctiCf" onclick="toFB()">
+		
+		<div id="h" ondrop="dr(event)" ondragover="aD(event)">
+			<div id="ih">
+				<p id="op">Cliquez sur l'icone photo ci-dessous<br>pour charger votre photo.</p>
+			</div>
+			
+			<canvas id="canvas" height="600px"></canvas>
+		</div>
+		
+		<div class="c" id="co" style="position:relative;">
+			<form class="up">
+				<input type="file" class="f" onchange="onS(event)" multiple style="position:absolute"/>
+				<img src="http://bit.ly/1jWGSJB" class="s">
+				<img src="http://bit.ly/1ohLrTU" class="r" onclick="onR()">
+			</form>
+		</div>
+		
+		<script src="https://rawgit.com/kangax/fabric.js/master/dist/fabric.min.js"></script>
+		<script src="https://rawgit.com/codrops/Elastislide/master/js/modernizr.custom.17475.js"></script>
+		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="https://rawgit.com/codrops/Elastislide/master/js/jquerypp.custom.js"></script>
+		<script src="https://rawgit.com/codrops/Elastislide/master/js/jquery.elastislide.js"></script>
+		
+		<script>
+			if (!fabric) {
+				location.reload(true);
+			}
+			
+			// Create a new fabric canvas
+			var ca = new fabric.Canvas('canvas');
+			var ctx = ca.getContext("2d");
+			
+			// Dynamically set the canvas to fill its parent
+			ca.setDimensions({
+				width:document.getElementById('h').clientWidth,
+				height:document.getElementById('h').clientHeight});
+			ca.on("after:render", function(){
+				ca.calcOffset();});
+			
+			// key listener to remove images when the delete key is pressed
+			window.onkeyup = function(e){
+				var key = e.keyCode || e.charCode;
+				
+				if(key == 46){ // corresponds to delete key
+					ca.remove(ca.getActiveObject());
+				}
+			};
+			
+			/*** The facebook icon is clicked, we do further FB integration in maskToFb ***/
+			var w;
+			// Callback function called when maskToFb.html has been loaded
+			function whenLoaded(){
+				// Extract the image from the canvas and set it as the source of the img in maskToFb
+				w.document.getElementById("maskedPic").src = ca.toDataURL();
+				// Call the function resizeImage defined in maskToFb
+				w.resizeImage(ca.width, ca.height);
+			}
+			function toFB(){
+				// Deactivate all objects in the canvas to avoid exporting the surrounding rectangle
+				// around selected elements.
+				ca.deactivateAll();
+				
+				// Dynamically open maskToFb.html
+				w = window.open('maskToFb.html','width=1235,height=530');
+				// Setup event listeners for when the page maskToFb.html has been loaded
+				if (w.attachEvent) {
+					w.attachEvent('onload', whenLoaded);
+				}
+				else if (w.addEventListener) {
+					w.addEventListener('load', whenLoaded, false);
+				}
+				else {
+					document.addEventListener('load', whenLoaded, false);
+				}
+			}
+			/******************************************************************************/
+			
+			// When a picture from the carousel is dragged over the canvas
+			function aD(e){
+				// By default, data/elements cannot be dropped in other elements.
+				// To allow a drop, we must prevent the default handling of the element.
+				e.preventDefault();
+			}
+			
+			// When we start dragging a picture from the carousel
+			function drag(e){
+				// we save the identifier of the image dragged
+				e.dataTransfer.setData("text",e.target.id);
+			}
+			
+			var oldImg;
+			// When we drop the image in the canvas
+			function dr(e) {
+				// Prevent the browser default handling of the data (default is open as link on drop)
+				e.preventDefault();
+				
+				// Get the identifier of the image picked from the carousel
+				var data = e.dataTransfer.getData("text");
+				// Retrieve the image from the document element
+				var imgFromCarousel = document.getElementById(data);
+				
+				// Load the image from the carousel to the fabric canvas
+				fabric.util.loadImage(imgFromCarousel.src, function(myImg) {
+				    var object = new fabric.Image(myImg);
+				    
+				    /*** Correct the position of the object so it's positioned where it's dropped ***/
+				    var position = ca._offset;
+				    var leftP = e.pageX-position.left;
+				    var topP = e.pageY-position.top;
+				    
+				    object.set({
+				    	left: leftP-imgFromCarousel.width/2,
+				    	top: topP-imgFromCarousel.height/2
+				    });
+				    /********************************************************************************/
+				    
+				    // Rescale the image as the source images are fairly big
+				    object.scaleX = object.scaleY = .25;
+				    
+				    // Add the image to the canvas
+				    ca.add(object);
+				    // Force refresh in the canvas
+				    ca.renderAll();
+				}, null, {crossOrigin: 'Anonymous'}); // crossOrigin: 'Anonymous' is necessary to execute
+													  // canvas.toDataURL() when we'll want to get the content
+													  // of the canvas and post it to FB (cf CORS : http://enable-cors.org/index.html)
+			}
+			
+			// When we click on the garbage button we clear out the canvas
+			function onR(){
+				document.getElementById('op').style.opacity="1"; // show the explanation text again
+				ca.clear(); // remove everything from the canvas
+			}
+			
+			// When we click on the image button in order to upload a picture to the canvas
+			// This
+			function onS(e){
+				var sF = e.target.files[0];
+				// load the file picker
+				var r = new FileReader();
+				// Define callback function for when the user selected a file to upload
+				r.onload = function(e){ 
+					// 
+					fabric.Image.fromURL(e.target.result, function(g){
+						cb(g);});
+				};
+				r.readAsDataURL(sF);
+			}
+			
+			// callback function to draw the main picture in the canvas
+			var cb = function(g) {
+				if(!g)
+					g = this;
+				
+				// Resize the image in the canvas by selecting the biggest dimension:
+				// width or height of the image, we then set this dimension to fill the canvas
+				// and apply the same transformation on the other dimension to keep the proportions of the image
+				if(g.width >= g.height) {
+					g.height = g.height * (ca.width / g.width);
+					g.width = ca.width;
+				}
+				else {
+					g.width = g.width * (ca.height / g.height);
+					g.height = ca.height;
+				}
+				
+				// Hide the informative text in the canvas
+				document.getElementById('op').style.opacity = "0";
+				
+				// Update the position of the image
+				var xP = ca.width/2 - g.width/2;
+				var yP = ca.height/2 - g.height/2;
+				g.left = xP;
+				g.top = yP;
+				
+				// Add the image to the canvas
+				ca.add(g);
+			}
+		</script>
+					
+		<script >$('#carousel').elastislide();</script>
+	</body>
+</html>

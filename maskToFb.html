@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+    <head>
+        <title>Upload Picture To Facebook!</title>
+		<!--<link rel="shortcut icon" type="image/png" href="mask/iconToFB.ico">-->
+    </head>
+    <body>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="shortcut icon" type="image/png" href="http://i.imgur.com/BUH0XEv.png">
+		<div id="fb-root"></div>
+		
+			<img style="display:block;margin:0 auto" id="maskedPic"/><br/><br/>
+			<textarea style="display: block;margin:0 auto" id="maskedText" rows="4" cols="50">Cr&eacute;er vos photos mask&eacute;s sur www.maskfrance.com !</textarea><br/><br/><br/>
+			
+			<div style="float: right;margin-bottom:10px" id="buttons">
+				<a class="myButton" onclick="uploadonwall()">Partager Photo</a>
+				<a style="margin-right:30px; margin-left:5px" class="cancelButton" onclick="window.close()">Annuler</a>
+			</div>
+		
+		<style>
+			.cancelButton {
+				box-shadow:inset 0px 1px 0px 0px #ffffff;
+				background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+				background-color:#ffffff;
+				border:1px solid #dcdcdc;
+				display:inline-block;
+				cursor:pointer;
+				color:#666666;
+				font-family:arial;
+				font-size:13px;
+				font-weight:bold;
+				padding:6px 12px;
+				text-decoration:none;
+			}
+			.cancelButton:hover {
+				background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
+				background:-moz-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+				background:-webkit-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+				background:-o-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+				background:-ms-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+				background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+				filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f6f6f6', endColorstr='#ffffff',GradientType=0);
+				background-color:#f6f6f6;
+			}
+			.cancelButton:active {
+				position:relative;
+				top:1px;
+			}
+
+			.myButton {
+				box-shadow:inset 0px 1px 0px 0px #7a8eb9;
+				background:linear-gradient(to bottom, #637aad 5%, #5972a7 100%);
+				background-color:#637aad;
+				border:1px solid #314179;
+				display:inline-block;
+				cursor:pointer;
+				color:#ffffff;
+				font-family:arial;
+				font-size:13px;
+				font-weight:bold;
+				padding:6px 12px;
+				text-decoration:none;
+			}
+			.myButton:hover {
+				background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #5972a7), color-stop(1, #637aad));
+				background:-moz-linear-gradient(top, #5972a7 5%, #637aad 100%);
+				background:-webkit-linear-gradient(top, #5972a7 5%, #637aad 100%);
+				background:-o-linear-gradient(top, #5972a7 5%, #637aad 100%);
+				background:-ms-linear-gradient(top, #5972a7 5%, #637aad 100%);
+				background:linear-gradient(to bottom, #5972a7 5%, #637aad 100%);
+				filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#5972a7', endColorstr='#637aad',GradientType=0);
+				background-color:#5972a7;
+			}
+			.myButton:active {
+				position:relative;
+				top:1px;
+			}
+		</style>
+		
+		<script src="https://connect.facebook.net/en_US/all.js"></script>
+		<script src="https://rawgit.com/danguer/blog-examples/master/js/base64-binary.js"></script>
+		
+		<script type="text/javascript">
+			var accessToken;
+			FB.init({
+				appId  : '############', // replace by your appID from FB developer console
+				status : true, // check login status
+				xfbml  : true,  // parse XFBML
+				cookie: true,
+				version: 'v2.0'
+			});
+			
+			// Check if the current user is logged in and has authorized the app
+			FB.getLoginStatus(checkLoginStatus);
+			// Log in the current user via FB and ask for permission to publish
+			function authUser() {
+				FB.login(checkLoginStatus, {scope:'publish_actions,publish_stream'});
+			}
+			// Check the result of the user status
+			function checkLoginStatus(response) {
+				if(response && response.status == 'connected') {
+				  console.log('User is authorized');
+				  accessToken = response.authResponse.accessToken;
+				} else {
+				  console.log('User is not authorized');
+				  authUser();
+				}
+			}
+			
+			// Function to initiate use of the Facebook SDK
+			(function(d, s, id){
+				var js, fjs = d.getElementsByTagName(s)[0];
+				if (d.getElementById(id)) {
+					return;
+				}
+				js = d.createElement(s); js.id = id;
+				js.src = "//connect.facebook.net/en_US/sdk.js";
+				fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+			
+			// Set sendAsBinary method to set FB required format of form
+			if ( XMLHttpRequest.prototype.sendAsBinary === undefined ) {
+				XMLHttpRequest.prototype.sendAsBinary = function(string) {
+					var bytes = Array.prototype.map.call(string, function(c) {
+						return c.charCodeAt(0) & 0xff;
+					});
+					this.send(new Uint8Array(bytes).buffer);
+				};
+			}
+			
+			// Override listener when the page has been loaded
+			window.onload = function() {
+				// Retrieve the canvas of the parent page
+				var parentCanvas = window.opener.ca;
+				// Set the src of the img element
+				document.getElementById("maskedPic").src=parentCanvas.toDataURL();
+				
+				resizeImage(parentCanvas.width,parentCanvas.height);
+			}
+			// Resize the img (divide in half) as it is too big for our purpose
+			function resizeImage(w,h){
+				var img = document.getElementById("maskedPic");
+				img.width=w/2;
+				img.height=h/2;
+			}
+			
+			// Called when user clicks on the "Partager Photo" (Share photo) button
+			function uploadonwall(){
+				// Retrieve the image
+				var c = document.getElementById("maskedPic").src;
+				// Chop the front of the image description
+				var encodedPng = c.substring(c.indexOf(',')+1,c.length);
+				// Decode the image from base64
+				var decodedPng = Base64Binary.decode(encodedPng);
+				// Post the image to FB
+				PostImageToFacebook(accessToken,
+									'masked.png',
+									'image/png',
+									decodedPng,
+									document.getElementById("maskedText").value);
+			}
+			
+			// Main function to post the image to FB wall
+			function PostImageToFacebook( authToken, filename, mimeType, imageData, message ) {
+				authUser();
+				
+				// Random boundary defined to separate element in form
+				var boundary = '----ThisIsTheBoundary1234567890';
+				
+				// this is the multipart/form-data boundary we'll use
+				var formData = '--' + boundary + '\r\n'
+				formData += 'Content-Disposition: form-data; name="source"; filename="' + filename + '"\r\n';
+				formData += 'Content-Type: ' + mimeType + '\r\n\r\n';
+				
+				// let's encode our image file
+				for ( var i = 0; i < imageData.length; ++i ) {
+					formData += String.fromCharCode( imageData[ i ] & 0xff );
+				}
+				
+				formData += '\r\n';
+				formData += '--' + boundary + '\r\n';
+				formData += 'Content-Disposition: form-data; name="message"\r\nContent-Type: text/html; charset=utf-8\r\n\r\n';
+				formData += message + '\r\n'
+				formData += '--' + boundary + '--\r\n';
+				
+				// Create a POST XML Http Request
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'POST', 'https://graph.facebook.com/me/photos?access_token=' + authToken, true );
+				// Call back function if POST request succeed or fail
+				xhr.onload = xhr.onerror = function() {
+					if ( !(xhr.responseText.split('"')[1] == "error") ) {
+						// If there is no error we redirect the user to the FB post she/he just created
+						var userID = xhr.responseText.split('"')[7].split('_')[0];
+						var postID = xhr.responseText.split('"')[7].split('_')[1];
+						w = window.open('https://www.facebook.com/'+userID+'/posts/'+postID,
+								'width=1235,height=530');
+					}
+					else {
+						alert("Erreur: "+xhr.responseText);
+					}
+				};
+				xhr.setRequestHeader( "Content-Type", "multipart/form-data; boundary=" + boundary );
+				
+				// Attach the data to the request as binary
+				xhr.sendAsBinary( formData );
+			}
+		</script>
+	</body>
+</html>
